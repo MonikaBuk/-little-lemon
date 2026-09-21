@@ -39,109 +39,168 @@ import com.example.littlelemon.ui.theme.yellow
 import com.example.littlelemon.ui.theme.h1
 import com.example.littlelemon.ui.theme.h2
 import com.example.littlelemon.ui.theme.body1 as b1
+import androidx.compose.runtime.*
 
 @Composable
 fun HomeScreen(navController: NavHostController, menuDao: MenuDao) {
+
     var searchPhrase by remember {
         mutableStateOf("")
     }
 
-    // getMenuItems() returns a Flow<List<MenuItemEntity>>, collected as Compose state.
-    val menuItems by menuDao.getMenuItems().collectAsState(initial = emptyList())
+    var selectedCategory by remember {
+        mutableStateOf<String?>(null)
+    }
+
+    val menuItems by menuDao.getMenuItems()
+        .collectAsState(initial = emptyList())
+
+    // Filter the menu whenever searchPhrase changes
+    val filteredMenuItems = menuItems.filter { item ->
+
+        val matchesSearch =
+            searchPhrase.isBlank() ||
+                    item.title.contains(searchPhrase, ignoreCase = true)
+
+        val matchesCategory =
+            selectedCategory == null ||
+                    item.category.equals(selectedCategory, ignoreCase = true)
+
+        matchesSearch && matchesCategory
+    }
+    val category: String
+    val categories = menuItems
+        .map { it.category }
+        .distinct()
 
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxSize()
     ) {
-        // --- Top content area (Logo, Banner, and Fields grouped) ---
-        Column(modifier = Modifier.fillMaxWidth()) {
 
-            // Logo row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Little Lemon logo"
-                )
-            }
+        // LOGO
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Little Lemon logo"
+            )
+        }
 
-            // Green banner
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(green)
-                    .padding(horizontal = 24.dp, vertical = 24.dp)
-            ) {
-                Text(
-                    text = "Little Lemon",
-                    style = Typography.h1,
-                    color = yellow
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = "Chicago",
-                            style = Typography.h2,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "We are a family-owned Mediterranean restaurant, focused on traditional recipes served with a modern twist",
-                            style = Typography.b1,
-                            color = Color.White,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    }
-                    Image(
-                        painter = painterResource(id = R.drawable.upperpanelimage),
-                        contentDescription = "Hero Image",
-                        modifier = Modifier
-                            .size(130.dp)
-                            .clip(RoundedCornerShape(16.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                TextField(
-                    value = searchPhrase,
-                    onValueChange = { searchPhrase = it },
-                    placeholder = { Text("Enter search phrase") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = ""
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    )
-                )
-            }
+        // GREEN AREA
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(green)
+                .padding(horizontal = 24.dp, vertical = 24.dp)
+        ) {
 
-            MenuItems(
-                menuItems = menuItems,
-                modifier = Modifier.weight(1f)
+            Text(
+                text = "Little Lemon",
+                style = Typography.h1,
+                color = yellow
             )
 
-            Button(onClick = { navController.navigate(Profile.route) }) {
-                Text("Go to Profile")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "Chicago",
+                        style = Typography.h2,
+                        color = Color.White
+                    )
+
+                    Text(
+                        text = "We are a family-owned Mediterranean restaurant, focused on traditional recipes served with a modern twist",
+                        style = Typography.b1,
+                        color = Color.White,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+
+                Image(
+                    painter = painterResource(id = R.drawable.upperpanelimage),
+                    contentDescription = "Hero Image",
+                    modifier = Modifier
+                        .size(130.dp)
+                        .clip(RoundedCornerShape(16.dp)),
+                    contentScale = ContentScale.Crop
+                )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // SEARCH FIELD
+            TextField(
+                value = searchPhrase,
+                onValueChange = { searchPhrase = it },
+                placeholder = {
+                    Text("Enter Search Phrase")
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Button(
+                onClick = {
+                    selectedCategory = null
+                }
+            ) {
+                Text("All")
+            }
+
+            categories.forEach { category ->
+
+                Button(
+                    onClick = {
+                        selectedCategory = category
+                    }
+                ) {
+                    Text(
+                        text = category.replaceFirstChar {
+                            it.uppercase()
+                        }
+                    )
+                }
+            }
+        }
+
+        // FOOD LIST - OUTSIDE GREEN AREA
+        MenuItems(
+            menuItems = filteredMenuItems,
+            modifier = Modifier.weight(1f)
+        )
+
+        // PROFILE BUTTON
+        Button(
+            onClick = {
+                navController.navigate(Profile.route)
+            }
+        ) {
+            Text("Go to Profile")
         }
     }
 }

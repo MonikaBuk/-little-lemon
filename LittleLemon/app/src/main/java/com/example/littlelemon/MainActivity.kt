@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     private lateinit var database: AppDatabase
     private lateinit var menuDao: MenuDao
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -40,7 +39,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             LittleLemonTheme {
-                // Pass menuDao or data as needed to Navigation or ViewModels
                 Navigation(navController = navController, context = this, menuDao = menuDao)
             }
         }
@@ -50,6 +48,5 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     LittleLemonTheme {
-        // Greeting("Android") // Removed or kept as needed, but Navigation is primary here
     }
 }

@@ -7,13 +7,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
 @Composable
-fun Navigation(navController: NavHostController, context: Context) {
+fun Navigation(navController: NavHostController, context: Context, menuDao: MenuDao) {
     NavHost(navController = navController, startDestination = Onboarding.route) {
         composable(Onboarding.route) {
             Onboarding(navController)
         }
         composable(Home.route) {
-            HomeScreen(navController)
+            HomeScreen(navController, menuDao)
         }
         composable(Profile.route) {
             ProfileScreen(navController)

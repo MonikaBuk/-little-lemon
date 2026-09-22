@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,17 +15,21 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.littlelemon.ui.theme.Typography
-import com.example.littlelemon.ui.theme.body1
-import com.example.littlelemon.ui.theme.h2
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
@@ -43,12 +46,19 @@ fun ProfileScreen(navController: NavHostController) {
             .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // --- Top: Logo row ---
-        Row(
+        Box(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+            contentAlignment = Alignment.Center
         ) {
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Little Lemon logo",
@@ -56,30 +66,28 @@ fun ProfileScreen(navController: NavHostController) {
             )
         }
 
-        // --- Middle: Content information ---
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
-            Text(text = "Profile information:", style = Typography.headlineLarge)
+            Spacer(modifier = Modifier.height(48.dp))
+            Text(text = "Profile information", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(32.dp))
             
-            Text(text = "First Name: $firstName", style = Typography.body1)
+            ProfileReadOnlyField("First name", firstName)
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text(text = "Last Name: $lastName", style = Typography.body1)
+            ProfileReadOnlyField("Last name", lastName)
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text(text = "Email: $email", style = Typography.body1)
+            ProfileReadOnlyField("Email", email)
         }
 
-        // --- Bottom: Log out button ---
         Button(
             onClick = {
                 sharedPreferences.edit().clear().apply()
-                // Navigate to Onboarding screen
                 navController.navigate(Onboarding.route) {
                     popUpTo(Home.route) { inclusive = true }
                 }
@@ -95,5 +103,32 @@ fun ProfileScreen(navController: NavHostController) {
         ) {
             Text(text = "Log out")
         }
+    }
+}
+
+@Composable
+private fun ProfileReadOnlyField(
+    label: String,
+    value: String
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        OutlinedTextField(
+            value = value,
+            onValueChange = {},
+            readOnly = true,
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(6.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.LightGray,
+                focusedBorderColor = MaterialTheme.colorScheme.primary
+            )
+        )
     }
 }

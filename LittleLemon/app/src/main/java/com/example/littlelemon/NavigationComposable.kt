@@ -8,7 +8,12 @@ import androidx.navigation.compose.composable
 
 @Composable
 fun Navigation(navController: NavHostController, context: Context, menuDao: MenuDao) {
-    NavHost(navController = navController, startDestination = Onboarding.route) {
+    val sharedPreferences = context.getSharedPreferences("LittleLemon", Context.MODE_PRIVATE)
+    val hasUserData = !sharedPreferences.getString("email", "").isNullOrBlank()
+    
+    val startDestination = if (hasUserData) Home.route else Onboarding.route
+
+    NavHost(navController = navController, startDestination = startDestination) {
         composable(Onboarding.route) {
             Onboarding(navController)
         }

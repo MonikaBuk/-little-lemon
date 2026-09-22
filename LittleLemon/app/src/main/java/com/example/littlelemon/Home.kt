@@ -18,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,7 +38,12 @@ import com.example.littlelemon.ui.theme.yellow
 import com.example.littlelemon.ui.theme.h1
 import com.example.littlelemon.ui.theme.h2
 import com.example.littlelemon.ui.theme.body1 as b1
-import androidx.compose.runtime.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun HomeScreen(navController: NavHostController, menuDao: MenuDao) {
@@ -68,7 +72,6 @@ fun HomeScreen(navController: NavHostController, menuDao: MenuDao) {
 
         matchesSearch && matchesCategory
     }
-    val category: String
     val categories = menuItems
         .map { it.category }
         .distinct()
@@ -77,18 +80,35 @@ fun HomeScreen(navController: NavHostController, menuDao: MenuDao) {
         modifier = Modifier.fillMaxSize()
     ) {
 
-        // LOGO
-        Row(
+        // TOP BAR WITH LOGO AND PROFILE
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 24.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(vertical = 24.dp, horizontal = 16.dp),
+            contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Little Lemon logo"
+                contentDescription = "Little Lemon logo",
+                modifier = Modifier.size(width = 180.dp, height = 40.dp)
             )
+
+            Button(
+                onClick = {
+                    navController.navigate(Profile.route)
+                },
+                modifier = Modifier
+                    .size(40.dp)
+                    .align(Alignment.CenterEnd),
+                shape = RoundedCornerShape(20.dp),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text(
+                    text = "P",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         // GREEN AREA
@@ -157,50 +177,66 @@ fun HomeScreen(navController: NavHostController, menuDao: MenuDao) {
                 modifier = Modifier.fillMaxWidth()
             )
         }
+        
+        Text(
+            text = "ORDER FOR DELIVERY",
+            style = Typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
 
             Button(
                 onClick = {
                     selectedCategory = null
-                }
+                },
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(36.dp)
             ) {
-                Text("All")
+                Text(
+                    text = "All",
+                    fontSize = 15.sp,
+                    maxLines = 1
+                )
             }
 
             categories.forEach { category ->
-
                 Button(
                     onClick = {
                         selectedCategory = category
-                    }
+                    },
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(36.dp)
                 ) {
                     Text(
-                        text = category.replaceFirstChar {
-                            it.uppercase()
-                        }
+                        text = category.replaceFirstChar { it.uppercase() },
+                        fontSize = 14.sp,
+                        maxLines = 1
                     )
                 }
             }
         }
+
+        HorizontalDivider(
+            color = Color.LightGray,
+            thickness = 1.dp,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
         // FOOD LIST - OUTSIDE GREEN AREA
         MenuItems(
             menuItems = filteredMenuItems,
             modifier = Modifier.weight(1f)
         )
-
-        // PROFILE BUTTON
-        Button(
-            onClick = {
-                navController.navigate(Profile.route)
-            }
-        ) {
-            Text("Go to Profile")
-        }
     }
 }

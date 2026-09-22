@@ -81,13 +81,13 @@ fun Onboarding(navController: NavHostController) {
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 LabeledField("First name", firstName) { firstName = it }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 LabeledField("Last name", lastName) { lastName = it }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 LabeledField("Email", email) { email = it }
             }
